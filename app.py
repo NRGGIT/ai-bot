@@ -28,7 +28,6 @@ def provider_completion(prompt, messages, provider, api_key, model):
             messages=messages
         )
         return resp.choices[0].message.content
-
     elif provider == 'gemini' and genai:
         genai.configure(api_key=api_key)
         model_obj = genai.GenerativeModel(model)
@@ -73,12 +72,15 @@ def send_message():
     user_msg = request.form.get('message')
     chat_state['messages'].append({'role': 'user', 'content': user_msg})
 
-    system_prompt = f"You are in a roleplay chat. The user personality is: {chat_state['user_personality']}\n"
+    system_prompt = f"Ты участвуешь в ролевом чате. Личность пользователя: {chat_state['user_personality']}\n"
     for c in chat_state['characters']:
-        system_prompt += f"Character {c['name']}: {c['description']}\n"
+        system_prompt += f"Персонаж {c['name']}: {c['description']}\n"
     if chat_state['summary']:
-        system_prompt += f"Past summary:\n{chat_state['summary']}\n"
-    system_prompt += 'All characters should talk like real people.'
+        system_prompt += f"Краткое содержание прошлых сообщений:\n{chat_state['summary']}\n"
+    system_prompt += (
+        "Все персонажи общаются и действуют как настоящие люди. "
+        "Опиши их действия и эмоции вместе с репликой."
+    )
 
     messages = [{'role': 'system', 'content': system_prompt}] + chat_state['messages']
     try:
