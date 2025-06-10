@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+  <title>Story Chat Bot</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    textarea { width: 100%; height: 60px; }
+    .chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
+    .msg { margin: 5px 0; }
+  </style>
+</head>
+<body>
+<h1>Story Chat Bot</h1>
+<form id="setup">
+  <label>Your personality:</label><br>
+  <textarea name="personality"></textarea><br>
+  <div id="characters">
+    <div class="char">
+      <input name="character_name" placeholder="Character name">
+      <input name="character_desc" placeholder="Description">
+    </div>
+  </div>
+  <button type="button" id="add-char">Add character</button><br><br>
+  Provider:
+  <select name="provider">
+    <option value="openai">OpenAI</option>
+    <option value="gemini">Gemini</option>
+  </select><br>
+  API Key:<br><input name="api_key"><br>
+  Model:<br><input name="model" placeholder="gpt-3.5-turbo"><br>
+  <button type="submit">Start Chat</button>
+</form>
+<hr>
+<div class="chat" id="chat-box"></div>
+<input id="chat-input" placeholder="Your message"><button id="send">Send</button>
+<button id="reset">Delete Chat</button>
+<script>
+$(function(){
+  $('#add-char').click(function(){
+    $('#characters').append('<div class="char"><input name="character_name" placeholder="Character name"><input name="character_desc" placeholder="Description"></div>');
+  });
+  $('#setup').submit(function(e){
+    e.preventDefault();
+    $.post('/create_chat', $(this).serialize());
+  });
+  $('#send').click(function(){
+    var msg=$('#chat-input').val();
+    $('#chat-input').val('');
+    $('#chat-box').append('<div class="msg"><b>You:</b> '+msg+'</div>');
+    $.post('/send_message', {message: msg}, function(data){
+      $('#chat-box').append('<div class="msg"><b>AI:</b> '+data.reply+'</div>');
+      $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+    });
+  });
+  $('#reset').click(function(){
+    $.post('/delete_chat');
+    $('#chat-box').empty();
+  });
+});
+</script>
+</body>
+</html>
