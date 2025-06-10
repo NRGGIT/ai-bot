@@ -47,10 +47,13 @@ def summarize_history(provider, api_key, model, messages):
         return ''
 
 
-@app.route('/')
-def index():
-    return render_template('index.html', chat=chat_state)
-
+    system_prompt = f"Ты участвуешь в ролевом чате. Личность пользователя: {chat_state['user_personality']}\n"
+        system_prompt += f"Персонаж {c['name']}: {c['description']}\n"
+        system_prompt += f"Краткое содержание прошлых сообщений:\n{chat_state['summary']}\n"
+    system_prompt += (
+        "Все персонажи общаются и действуют как настоящие люди. "
+        "Опиши их действия и эмоции вместе с репликой."
+    )
 @app.route('/create_chat', methods=['POST'])
 def create_chat():
     chat_state['user_personality'] = request.form.get('personality', '')
