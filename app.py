@@ -50,7 +50,6 @@ def summarize_history(provider, api_key, model, messages):
         print('Summary failed', e)
         return ''
 
-
 @app.route('/')
 def index():
     return render_template('index.html', chat=chat_state)
@@ -91,7 +90,6 @@ def send_message():
         ai_reply = provider_completion(system_prompt, messages, chat_state['provider'], chat_state['api_key'], chat_state['model'])
     except Exception as e:
         ai_reply = f"Error from provider: {e}"
-
     chat_state['messages'].append({'role': 'assistant', 'content': ai_reply})
 
     if len(chat_state['messages']) >= 20 and len(chat_state['messages']) % 10 == 0:

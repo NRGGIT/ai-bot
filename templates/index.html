@@ -3,6 +3,7 @@
 <head>
   <title>Story Chat Bot</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
   <style>
     body { font-family: Arial, sans-serif; margin: 20px auto; max-width: 800px; }
     textarea { width: 100%; height: 80px; }
@@ -60,6 +61,7 @@ $(function(){
     $('#chat-box').append('<div class="msg"><b>You:</b> '+msg+'</div>');
     $.post('/send_message', {message: msg}, function(data){
       $('#chat-box').append('<div class="msg ai"><b>AI:</b> '+data.reply+'</div>');
+
       $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
     });
   }
