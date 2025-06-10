@@ -31,7 +31,11 @@ def provider_completion(prompt, messages, provider, api_key, model):
     elif provider == 'gemini' and genai:
         genai.configure(api_key=api_key)
         model_obj = genai.GenerativeModel(model)
-        response = model_obj.generate_content(messages)
+        gem_messages = []
+        for m in messages:
+            role = 'model' if m.get('role') == 'assistant' else 'user'
+            gem_messages.append({'role': role, 'parts': [m.get('content', '')]})
+        response = model_obj.generate_content(gem_messages)
         return response.text
     else:
         raise ValueError('Unknown provider or missing library')
