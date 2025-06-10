@@ -28,6 +28,7 @@ def provider_completion(prompt, messages, provider, api_key, model):
             messages=messages
         )
         return resp.choices[0].message.content
+
     elif provider == 'gemini' and genai:
         genai.configure(api_key=api_key)
         model_obj = genai.GenerativeModel(model)
