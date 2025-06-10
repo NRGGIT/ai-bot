@@ -4,6 +4,7 @@
   <title>Story Chat Bot</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.3/dist/purify.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; margin: 20px auto; max-width: 800px; }
     textarea { width: 100%; height: 80px; }
@@ -58,9 +59,9 @@ $(function(){
     var msg=$('#chat-input').val();
     if(!msg.trim()) return;
     $('#chat-input').val('');
-    $('#chat-box').append('<div class="msg"><b>You:</b> '+marked.parse(msg)+'</div>');
+    $('#chat-box').append('<div class="msg"><b>You:</b> '+DOMPurify.sanitize(marked.parse(msg))+'</div>');
     $.post('/send_message', {message: msg}, function(data){
-      $('#chat-box').append('<div class="msg ai"><b>AI:</b> '+marked.parse(data.reply)+'</div>');
+      $('#chat-box').append('<div class="msg ai"><b>AI:</b> '+DOMPurify.sanitize(marked.parse(data.reply))+'</div>');
       $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
     });
   }

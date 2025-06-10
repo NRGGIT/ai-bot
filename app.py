@@ -35,7 +35,15 @@ def provider_completion(prompt, messages, provider, api_key, model):
         for m in messages:
             role = 'model' if m.get('role') == 'assistant' else 'user'
             gem_messages.append({'role': role, 'parts': [m.get('content', '')]})
+
         response = model_obj.generate_content(gem_messages)
+        # If Gemini returns no candidates the `text` helper will raise. Provide
+        # a clearer error with the prompt feedback when available.
+        if not getattr(response, 'candidates', None):
+            feedback = getattr(response, 'prompt_feedback', None)
+            reason = getattr(feedback, 'block_reason', 'Unknown') if feedback else 'Unknown'
+            raise RuntimeError(f'Gemini request failed: {reason}')
+
         return response.text
     else:
         raise ValueError('Unknown provider or missing library')
