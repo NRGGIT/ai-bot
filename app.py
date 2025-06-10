@@ -31,7 +31,11 @@ def provider_completion(prompt, messages, provider, api_key, model):
     elif provider == 'gemini' and genai:
         genai.configure(api_key=api_key)
         model_obj = genai.GenerativeModel(model)
-        response = model_obj.generate_content(messages)
+        gem_messages = []
+        for m in messages:
+            role = 'model' if m.get('role') == 'assistant' else 'user'
+            gem_messages.append({'role': role, 'parts': [m.get('content', '')]})
+        response = model_obj.generate_content(gem_messages)
         return response.text
     else:
         raise ValueError('Unknown provider or missing library')
@@ -46,14 +50,10 @@ def summarize_history(provider, api_key, model, messages):
         print('Summary failed', e)
         return ''
 
+@app.route('/')
+def index():
+    return render_template('index.html', chat=chat_state)
 
-    system_prompt = f"Ты участвуешь в ролевом чате. Личность пользователя: {chat_state['user_personality']}\n"
-        system_prompt += f"Персонаж {c['name']}: {c['description']}\n"
-        system_prompt += f"Краткое содержание прошлых сообщений:\n{chat_state['summary']}\n"
-    system_prompt += (
-        "Все персонажи общаются и действуют как настоящие люди. "
-        "Опиши их действия и эмоции вместе с репликой."
-    )
 @app.route('/create_chat', methods=['POST'])
 def create_chat():
     chat_state['user_personality'] = request.form.get('personality', '')
