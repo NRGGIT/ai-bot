@@ -89,9 +89,7 @@ def send_message():
     try:
         ai_reply = provider_completion(system_prompt, messages, chat_state['provider'], chat_state['api_key'], chat_state['model'])
     except Exception as e:
-        print('Provider error:', e)
-        ai_reply = 'Sorry, there was an error contacting the AI provider.'
-
+        ai_reply = f"Error from provider: {e}"
     chat_state['messages'].append({'role': 'assistant', 'content': ai_reply})
 
     if len(chat_state['messages']) >= 20 and len(chat_state['messages']) % 10 == 0:
