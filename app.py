@@ -50,7 +50,6 @@ def summarize_history(provider, api_key, model, messages):
         print('Summary failed', e)
         return ''
 
-
 @app.route('/')
 def index():
     return render_template('index.html', chat=chat_state)
