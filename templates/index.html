@@ -4,24 +4,29 @@
   <title>Story Chat Bot</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 40px; }
-    textarea { width: 100%; height: 60px; }
-    .chat { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: scroll; }
+    body { font-family: Arial, sans-serif; margin: 20px auto; max-width: 800px; }
+    textarea { width: 100%; height: 80px; }
+    #characters .char { margin-bottom: 5px; }
+    #chat-box { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: scroll; }
     .msg { margin: 5px 0; }
+    .ai { color: #005a9c; }
   </style>
 </head>
 <body>
 <h1>Story Chat Bot</h1>
 <form id="setup">
-  <label>Your personality:</label><br>
-  <textarea name="personality"></textarea><br>
+  <label>Your personality:</label>
+  <textarea name="personality"></textarea>
+  <h3>Characters</h3>
   <div id="characters">
     <div class="char">
       <input name="character_name" placeholder="Character name">
       <input name="character_desc" placeholder="Description">
+      <button type="button" class="remove">x</button>
     </div>
   </div>
-  <button type="button" id="add-char">Add character</button><br><br>
+  <button type="button" id="add-char">Add character</button>
+  <br><br>
   Provider:
   <select name="provider">
     <option value="openai">OpenAI</option>
@@ -33,26 +38,33 @@
 </form>
 <hr>
 <div class="chat" id="chat-box"></div>
-<input id="chat-input" placeholder="Your message"><button id="send">Send</button>
+<input id="chat-input" placeholder="Your message" style="width:80%">
+<button id="send">Send</button>
 <button id="reset">Delete Chat</button>
 <script>
 $(function(){
   $('#add-char').click(function(){
-    $('#characters').append('<div class="char"><input name="character_name" placeholder="Character name"><input name="character_desc" placeholder="Description"></div>');
+    $('#characters').append('<div class="char"><input name="character_name" placeholder="Character name"><input name="character_desc" placeholder="Description"><button type="button" class="remove">x</button></div>');
+  });
+  $('#characters').on('click', '.remove', function(){
+    $(this).parent().remove();
   });
   $('#setup').submit(function(e){
     e.preventDefault();
     $.post('/create_chat', $(this).serialize());
   });
-  $('#send').click(function(){
+  function send(){
     var msg=$('#chat-input').val();
+    if(!msg.trim()) return;
     $('#chat-input').val('');
     $('#chat-box').append('<div class="msg"><b>You:</b> '+msg+'</div>');
     $.post('/send_message', {message: msg}, function(data){
-      $('#chat-box').append('<div class="msg"><b>AI:</b> '+data.reply+'</div>');
+      $('#chat-box').append('<div class="msg ai"><b>AI:</b> '+data.reply+'</div>');
       $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
     });
-  });
+  }
+  $('#send').click(send);
+  $('#chat-input').keydown(function(e){ if(e.key==='Enter'){ e.preventDefault(); send(); } });
   $('#reset').click(function(){
     $.post('/delete_chat');
     $('#chat-box').empty();

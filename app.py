@@ -1,6 +1,6 @@
 import os
 from flask import Flask, request, jsonify, render_template
-import openai
+from openai import OpenAI
 try:
     import google.generativeai as genai
 except Exception:
@@ -22,11 +22,13 @@ chat_state = {
 # Helpers
 def provider_completion(prompt, messages, provider, api_key, model):
     if provider == 'openai':
-        openai.api_key = api_key
-        return openai.ChatCompletion.create(
+        client = OpenAI(api_key=api_key)
+        resp = client.chat.completions.create(
             model=model,
             messages=messages
-        )['choices'][0]['message']['content']
+        )
+        return resp.choices[0].message.content
+
     elif provider == 'gemini' and genai:
         genai.configure(api_key=api_key)
         model_obj = genai.GenerativeModel(model)
